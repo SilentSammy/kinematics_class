@@ -75,45 +75,67 @@ def missingAxisQuestions():
     return slide_funcs
 
 def translationQuestions():
-    def question(q_idx, x, y, z, drawAx=True):
+    def question(q_idx, x, y, z, drawAx=True, objectPath=None):
         queue_text(Text("{}. How will the object move if translated by ({}, {}, {})?".format(q_idx, x, y, z), 32, 0.05, 0.05, col=(0, 0, 0)))
         if drawAx:
             drawAxes()
-        drawBox()
+        if objectPath:
+            drawObject(objectPath)
+        else:
+            drawBox()
 
-    def answer(q_idx, x, y, z):
+    def answer(q_idx, x, y, z, objectPath=None):
         queue_text(Text("{}. Translating to ({}, {}, {}) looks like this".format(q_idx, x, y, z), 32, 0.05, 0.05))
-        # Draw ghost box at starting position
+        # Draw ghost object/box at starting position
         drawAxes()
-        drawBox(opacity=80)
+        if objectPath:
+            drawObject(objectPath, opacity=80)
+        else:
+            drawBox(opacity=80)
         
-        # Draw animated box
+        # Draw animated object/box
         animateTranslate(x, y, z, 4.0, 3.0)
-        drawBox()
+        if objectPath:
+            drawObject(objectPath)
+        else:
+            drawBox()
         drawAxes()
 
-    questions = [ # x, y, z translations
+    questions = [ # x, y, z translations (optionally: drawAx, objectPath)
+        # First 2: single axis, no object
         (10, 0, 0),
-        (0, 10, 0),
-        (0, 0, -10),
-        (10, 10, 0),
-        (0, -10, -10),
-        (10, 0, 10),
-        (10, -10, 10),
+        (0, -10, 0),
+        # Next 2: introduce object
+        (0, 0, 10, True, "model.obj"),
+        (-10, 0, 0, True, "model.obj"),
+        # Next 2: hide axes
+        (0, 10, 0, False, "model.obj"),
+        (0, 0, -10, False, "model.obj"),
+        # Next 2: show axes again, but now multi-axis
+        (10, 10, 0, True, "model.obj"),
+        (-10, 0, 10, True, "model.obj"),
+        # Next 2: hide axes, multi-axis
+        (10, -10, 10, False, "model.obj"),
+        (-10, 10, -10, False, "model.obj"),
     ]
 
     slides = []
     slides.append(lambda: sectionTitle("Translations", "Identify where the object will move"))
-    for i, (x, y, z) in enumerate(questions):
+    for i, q in enumerate(questions):
         q_idx = i + 1
-        slides.append(lambda xi=x, yi=y, zi=z, qi=q_idx: question(qi, xi, yi, zi))
-        slides.append(lambda xi=x, yi=y, zi=z, qi=q_idx: answer(qi, xi, yi, zi))
+        # Unpack tuple with optional parameters
+        x, y, z = q[0], q[1], q[2]
+        drawAx = q[3] if len(q) > 3 else True
+        objectPath = q[4] if len(q) > 4 else None
+        
+        slides.append(lambda xi=x, yi=y, zi=z, da=drawAx, op=objectPath, qi=q_idx: question(qi, xi, yi, zi, da, op))
+        slides.append(lambda xi=x, yi=y, zi=z, op=objectPath, qi=q_idx: answer(qi, xi, yi, zi, op))
     
     return slides
 
 # SLIDE STUFF
 slides = [
-    missingAxisQuestions(),
+    # missingAxisQuestions(),
     translationQuestions(),
 ]
 slides = [item for sublist in slides for item in sublist]  # Flatten list of lists
@@ -148,6 +170,13 @@ def drawBox(opacity=255):
     strokeWeight(0.1)
     stroke(0)
     fill(200, 100, 100, opacity)
+    box(4, 4, 4)
+
+# TODO: Replace with actual object loading if needed
+def drawObject(filepath, opacity=255):
+    strokeWeight(0.1)
+    stroke(0)
+    fill(100, 200, 100, opacity)
     box(4, 4, 4)
 
 axes = [
