@@ -8,10 +8,7 @@ def setup():
 def draw():
     pushMatrix()
     setupScene()
-    
-    # Call the current slide function
-    slides[current_slide]()
-    
+    draw3DStuff()
     popMatrix()
     
     # Draw all queued text in screen space
@@ -19,6 +16,10 @@ def draw():
     Text(slide_counter, 24, 0.01, 0.94, col=(128, 128, 128)).draw()
     Text("Use arrow keys to navigate slides", 20, 0.01, 0.97, col=(128, 128, 128)).draw()
     draw_queued_text()
+
+def draw3DStuff():
+    # Call the current slide function
+    slides[current_slide]()
 
 # SLIDES
 def sectionTitle(title, subtitle=""):
@@ -73,13 +74,67 @@ def missingAxisQuestions():
     
     return slide_funcs
 
-# SLIDE STUFF
-slides = []
-slides.extend(missingAxisQuestions())
+def translationQuestions():
+    def question(q_idx, x, y, z, drawAx=True):
+        queue_text(Text("{}. How will the object move if translated by ({}, {}, {})?".format(q_idx, x, y, z), 32, 0.05, 0.05, col=(0, 0, 0)))
+        if drawAx:
+            drawAxes()
+        drawBox()
 
+    def answer(q_idx, x, y, z):
+        queue_text(Text("{}. Translating to ({}, {}, {}) looks like this".format(q_idx, x, y, z), 32, 0.05, 0.05))
+        # Draw ghost box at starting position
+        drawAxes()
+        drawBox(opacity=80)
+        
+        # Draw animated box
+        animateTranslate(x, y, z, 4.0, 3.0)
+        drawBox()
+        drawAxes()
+
+    questions = [ # x, y, z translations
+        (10, 0, 0),
+        (0, 10, 0),
+        (0, 0, -10),
+        (10, 10, 0),
+        (0, -10, -10),
+        (10, 0, 10),
+        (10, -10, 10),
+    ]
+
+    slides = []
+    slides.append(lambda: sectionTitle("Translations", "Identify where the object will move"))
+    for i, (x, y, z) in enumerate(questions):
+        q_idx = i + 1
+        slides.append(lambda xi=x, yi=y, zi=z, qi=q_idx: question(qi, xi, yi, zi))
+        slides.append(lambda xi=x, yi=y, zi=z, qi=q_idx: answer(qi, xi, yi, zi))
+    
+    return slides
+
+# SLIDE STUFF
+slides = [
+    missingAxisQuestions(),
+    translationQuestions(),
+]
+slides = [item for sublist in slides for item in sublist]  # Flatten list of lists
 current_slide = 0
 
 # DRAWING HELPERS
+def animate(duration, offset=0):
+    """Return normalized time (0.0 to 1.0) over duration seconds, with optional offset."""
+    time = millis() / 1000.0
+    adjusted_time = (time - offset) % duration
+    return adjusted_time / duration
+
+def animateHold(cycle_duration, anim_duration, offset=0):
+    """Animate from 0.0 to 1.0 over anim_duration, then hold at 1.0 for rest of cycle."""
+    return min(animate(cycle_duration, offset) * (cycle_duration / anim_duration), 1.0)
+
+def animateTranslate(x, y, z, cycle_duration, anim_duration, offset=0):
+    """Translate from origin to (x, y, z) over anim_duration, then hold."""
+    factor = animateHold(cycle_duration, anim_duration, offset)
+    translate(x * factor, y * factor, z * factor)
+
 def drawLines(lines):
     for weight, col, line_coords in lines:
         strokeWeight(weight)
@@ -88,6 +143,12 @@ def drawLines(lines):
 
 def drawAxes():
     drawLines(axes)
+
+def drawBox(opacity=255):
+    strokeWeight(0.1)
+    stroke(0)
+    fill(200, 100, 100, opacity)
+    box(4, 4, 4)
 
 axes = [
     (0.1, (255, 0, 0), (0, 0, 0, 10, 0, 0)),  # X-axis: red, goes to (10,0,0)
