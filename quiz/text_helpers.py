@@ -20,10 +20,12 @@ class Text:
         y = height * self.y_frac
         
         # Disable depth testing to ensure the text appears over the 3D graphics
-        hint(DISABLE_DEPTH_TEST)
+        pushStyle()
         fill(*self.col)
+        hint(DISABLE_DEPTH_TEST)
         text(self.msg, x, y)
         hint(ENABLE_DEPTH_TEST)
+        popStyle()
 
 def queue_text(text_obj):
     global text_queue

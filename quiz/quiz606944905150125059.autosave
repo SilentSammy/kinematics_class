@@ -34,8 +34,8 @@ def draw():
     
     # Draw all queued text in screen space
     slide_counter = "Slide {}/{}".format(current_slide + 1, len(slides))
-    Text(slide_counter, 24, 0.01, 0.94, col=(0, 0, 0, 255)).draw()
-    Text("Use arrow keys to navigate slides", 20, 0.01, 0.97, col=(0, 0, 0, 255)).draw()
+    Text(slide_counter, 24, 0.01, 0.94, col=(128, 128, 128)).draw()
+    Text("Use arrow keys to navigate slides", 20, 0.01, 0.97, col=(128, 128, 128)).draw()
     draw_queued_text()
 
 def draw3DStuff():
@@ -62,9 +62,7 @@ def mainTitle():
         pass  # Use defaults if file doesn't exist or can't be read
     
     titleSlide(title, subtitle)
-    # pushStyle()
     drawObject("title.obj", fill_color=(128, 0, 128))
-    # popStyle()
 
 def titleSlide(title, subtitle=""):
     # Generate unique identifier for this slide instance
@@ -99,7 +97,7 @@ def titleSlide(title, subtitle=""):
             subtitle_alpha = 255
         
         queue_text(Text(title, 64, 0.5, 0.4, col=(0, 0, 0, title_alpha), h_align=CENTER, v_align=CENTER))
-        queue_text(Text(subtitle, 36, 0.5, 0.55, col=(0, 0, 0, subtitle_alpha), h_align=CENTER, v_align=CENTER))
+        queue_text(Text(subtitle, 36, 0.5, 0.55, col=(100, 100, 100, subtitle_alpha), h_align=CENTER, v_align=CENTER))
     else:
         # No subtitle: fade in title over full duration
         title_alpha = int(min(t * 2, 1.0) * 255)  # Fade in over first half
@@ -108,7 +106,7 @@ def titleSlide(title, subtitle=""):
 def sectionTitle(title, subtitle=""):
     queue_text(Text(title, 48, 0.5, 0.45, col=(0, 0, 0), h_align=CENTER, v_align=CENTER))
     if subtitle:
-        queue_text(Text(subtitle, 32, 0.5, 0.55, col=(0, 0, 0), h_align=CENTER, v_align=CENTER))
+        queue_text(Text(subtitle, 32, 0.5, 0.55, col=(100, 100, 100), h_align=CENTER, v_align=CENTER))
 
 def missingAxisQuestions():
     def question(q_idx, rotX, rotY, missing_idx):
@@ -248,8 +246,6 @@ def rotationQuestions():
     questions = [ # axis (0=X, 1=Y, 2=Z), angle in degrees (optionally: drawAx, objectPath)
         # First 2: single axis, small angles, no object
         (0, 90),
-        (1, 90),
-        (2, 90),
         (1, -90),
         # Next 2: introduce object
         (2, 90, True, "model.obj"),

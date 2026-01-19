@@ -248,8 +248,6 @@ def rotationQuestions():
     questions = [ # axis (0=X, 1=Y, 2=Z), angle in degrees (optionally: drawAx, objectPath)
         # First 2: single axis, small angles, no object
         (0, 90),
-        (1, 90),
-        (2, 90),
         (1, -90),
         # Next 2: introduce object
         (2, 90, True, "model.obj"),
