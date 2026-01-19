@@ -78,7 +78,6 @@ def draw():
     popMatrix()
     # drawAxes()
 
-
 # Camera controls
 angleX = 0
 angleY = 0
