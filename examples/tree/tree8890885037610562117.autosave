@@ -1,32 +1,46 @@
 def setup():
     fullScreen(P3D)
 
-def draw():
-    # Set up scene
+def drawScene():
     background(255)
+    
+    # Set up lighting
     lights()
     directionalLight(180, 180, 180, -0.5, 0.5, -1)
+    
     translate(width/2, height/2, 0)
     scale(zoom)
+    
     rotateX(angleX)
     rotateY(angleY)
     rotateX(PI/2)
     rotateZ(PI/2)
     
-    # Your objects here
+def drawAxes():
+    # Reference frame (RGB axes)
+    pushStyle()
     stroke(255, 0, 0)
     line(0, 0, 0, 100, 0, 0)
     stroke(0, 255, 0)
     line(0, 0, 0, 0, 100, 0)
     stroke(0, 0, 255)
     line(0, 0, 0, 0, 0, 100)
+    popStyle()
 
-    box(30)
+def draw():
+    drawScene()
+    
+    # Your objects here
+    drawAxes()
+
+    translate(0, 0, 200)
+    drawAxes()
 
 # Camera controls
 angleX = 0
 angleY = 0
 zoom = 2
+
 def mouseDragged():
     global angleX, angleY
     angleY += (mouseX - pmouseX) * 0.01

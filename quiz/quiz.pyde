@@ -1,5 +1,6 @@
 from text_helpers import Text, queue_text, draw_queued_text
 import random
+import os
 
 # SCENE STUFF
 angleX = -0.2
@@ -11,8 +12,7 @@ def setupScene():
     
     # Set up lighting for each frame
     lights()
-    ambientLight(80, 80, 80)
-    directionalLight(180, 180, 180, -0.5, 0.5, -1)
+    directionalLight(255, 255, 255, -0.5, 0.5, -1)
     
     translate(width/2, height/2, 0)
     scale(zoom)
@@ -62,9 +62,14 @@ def mainTitle():
         pass  # Use defaults if file doesn't exist or can't be read
     
     titleSlide(title, subtitle)
-    # pushStyle()
-    drawObject("title.obj", fill_color=(128, 0, 128))
-    # popStyle()
+    drawAxes()
+    
+    # Draw title object or cube if file doesn't exist
+    if os.path.exists("title.obj"):
+        drawObject("title.obj", fill_color=(128, 0, 128))
+    else:
+        fill(255, 128, 128)
+        box(4, 4, 4)
 
 def titleSlide(title, subtitle=""):
     # Generate unique identifier for this slide instance
